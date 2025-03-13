@@ -3,10 +3,104 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ExcelToEdge"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:ExcelToEdge" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="ExcelToEdge" Height="500" Width="650">
+    <materialDesign:Card>
+        <TabControl VerticalContentAlignment="Top"
+                    materialDesign:ColorZoneAssist.Mode="PrimaryDark"
+                    Style="{StaticResource MaterialDesignNavigationRailTabControl}">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Width="auto" Height="auto">
+                        <materialDesign:PackIcon Width="24" Height="24" HorizontalAlignment="Center" Kind="Home" />
+                        <TextBlock HorizontalAlignment="Center" Text="홈" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="16">
+                    <TextBlock Margin="0,0,0,8" Style="{StaticResource MaterialDesignHeadline5TextBlock}" Text="홈" />
+                    <materialDesign:Card Margin="10" Visibility="{Binding IsExcelConnected, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock  Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Grid.Row="0" Margin="10" Grid.ColumnSpan="2">엑셀 파일에 연결하십시오</TextBlock>
+                            <ComboBox Grid.Row="1" Grid.Column="0" Margin="10"
+                                    materialDesign:HintAssist.Hint="현재 열려있는 엑셀 파일에 연결합니다"
+                                    ItemsSource="{Binding CurrentExcelWorkbooks}"
+                                    SelectedItem="{Binding SelectedExcelWorkbook, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="DropDownOpened">
+                                        <i:InvokeCommandAction Command="{Binding RefreshExcelWorkbooksCommand}"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="SelectionChanged">
+                                        <i:InvokeCommandAction Command="{Binding ExcelConnectedCommand}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </ComboBox>
+                        </Grid>
+                    </materialDesign:Card>
+                    <materialDesign:Card Margin="10" Visibility="{Binding IsExcelConnected, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.3*"/>
+                                <ColumnDefinition Width="0.7*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock  Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Grid.Row="0" Margin="10" Grid.Column="0" HorizontalAlignment="Right">연결된 워크북:</TextBlock>
+                            <TextBlock  Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Grid.Row="1" Margin="10" Grid.Column="0" HorizontalAlignment="Right">활성 시트:</TextBlock>
+                            <materialDesign:Chip Grid.Row="0" Grid.Column="1" Content="{Binding ExcelWorkbookName}" Style="{StaticResource MaterialDesignOutlineChip}"/>
+                            <materialDesign:Chip Grid.Row="1" Grid.Column="1" Content="{Binding ExcelWorksheetName}" />
 
-    </Grid>
+                            <Button Grid.Row ="2" Grid.ColumnSpan="2"  Command="{Binding DisconnectExcelCommand}" Margin="10" Style="{StaticResource MaterialDesignPaperDarkButton}">
+                                <TextBlock Text="연결 끊기" />
+                            </Button>
+                        </Grid>
+                    </materialDesign:Card>
+                </StackPanel>
+
+            </TabItem>
+            <TabItem IsEnabled="{Binding IsExcelConnected}">
+                <TabItem.Header>
+                    <StackPanel Width="auto" Height="auto">
+                        <materialDesign:PackIcon Width="24" Height="24" HorizontalAlignment="Center" Kind="CardSearch" />
+                        <TextBlock HorizontalAlignment="Center" Text="Search" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="16">
+                    <TextBlock Margin="0,0,0,8" Style="{StaticResource MaterialDesignHeadline5TextBlock}" Text="Search" />
+                    <materialDesign:Card Margin="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.6*"/>
+                                <ColumnDefinition Width="0.2*"/>
+                                <ColumnDefinition Width="0.2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock  Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Margin="10" VerticalAlignment="Center">Names</TextBlock>
+                            <TextBlock  Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Grid.Column="1" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Right">Shortcut</TextBlock>
+                            <Button Grid.Column="2" Command="{Binding DrawSearchCommand}" Margin="10"  Style="{StaticResource MaterialDesignRaisedDarkButton}">
+                                <TextBlock Text="설정" />
+                            </Button>
+                        </Grid>
+                    </materialDesign:Card>
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniButton}">
+                        <materialDesign:PackIcon
+                            Width="20"
+                            Height="20"
+                            Kind="Plus" />
+                    </Button>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </materialDesign:Card>
+
+
 </Window>
