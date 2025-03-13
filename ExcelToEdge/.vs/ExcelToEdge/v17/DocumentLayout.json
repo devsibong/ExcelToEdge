@@ -42,8 +42,7 @@
               "RelativeToolTip": "Views\\MainWindow.xaml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-13T06:19:19.338Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-13T06:19:19.338Z"
             },
             {
               "$type": "Document",
@@ -53,7 +52,7 @@
               "RelativeDocumentMoniker": "ViewModels\\MainViewModel.cs",
               "ToolTip": "C:\\Users\\seoha\\Desktop\\MyProjects\\002.GSSupport\\SourceCode\\ExcelToEdge\\ViewModels\\MainViewModel.cs",
               "RelativeToolTip": "ViewModels\\MainViewModel.cs",
-              "ViewState": "AgIAAC8AAAAAAAAAAAAwwEgAAAA0AAAAAAAAAA==",
+              "ViewState": "AgIAAHAAAAAAAAAAAAAcwH8AAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-13T05:56:44.452Z",
               "EditorCaption": ""
@@ -67,8 +66,7 @@
               "ToolTip": "C:\\Users\\seoha\\Desktop\\MyProjects\\002.GSSupport\\SourceCode\\ExcelToEdge\\Views\\MainWindow.xaml",
               "RelativeToolTip": "Views\\MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-03-13T05:56:44.974Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-13T05:56:44.974Z"
             },
             {
               "$type": "Document",
@@ -80,8 +78,7 @@
               "RelativeToolTip": "App.xaml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAABPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-13T05:13:37.016Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-13T05:13:37.016Z"
             }
           ]
         }

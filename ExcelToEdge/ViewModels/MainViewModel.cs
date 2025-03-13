@@ -125,8 +125,15 @@ namespace ExcelToEdge.ViewModels
         {
             if (sh is Worksheet worksheet && IsExcelConnected && _excelWorksheet != worksheet)
             {
-                _excelWorksheet = worksheet;
-                ExcelWorksheetName = _excelWorksheet.Name;
+                // 현재 활성화된 워크북 가져오기
+                Workbook activeWorkbook = _excelApp.ActiveWorkbook;
+
+                // _excelWorkbook이 null이 아니고, 활성화된 워크북이 _excelWorkbook과 동일한지 확인
+                if (_excelWorkbook != null && activeWorkbook != null && activeWorkbook.FullName == _excelWorkbook.FullName)
+                {
+                    _excelWorksheet = worksheet;
+                    ExcelWorksheetName = _excelWorksheet.Name;
+                }
             }
         }
 
