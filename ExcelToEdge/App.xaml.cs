@@ -16,7 +16,6 @@ namespace ExcelToEdge;
 public partial class App : Application
 {
     public static ServiceProvider ServiceProvider { get; private set; } = null;
-
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
