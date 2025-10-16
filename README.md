@@ -89,3 +89,61 @@ if __name__ == "__main__":
         table_dst="customers_backup",
         where_clause=None  # 예: text("id > 100")
     )
+
+
+
+
+
+    from sqlalchemy import create_engine, select, insert, func
+from sqlalchemy.exc import SQLAlchemyError
+
+def transfer_data(conn_str_src, schema_src, table_src,
+                  conn_str_dst, schema_dst, table_dst,
+                  where_clause=None, chunk_size=1000):
+    engine_src = create_engine(conn_str_src)
+    engine_dst = create_engine(conn_str_dst)
+
+    src_table = get_table(conn_str_src, schema_src, table_src)
+    dst_table = get_table(conn_str_dst, schema_dst, table_dst)
+
+    # --- row count 계산 ---
+    with engine_src.connect() as conn_src:
+        stmt_count = select(func.count()).select_from(src_table)
+        if where_clause is not None:
+            stmt_count = stmt_count.where(where_clause)
+        count = conn_src.execute(stmt_count).scalar()
+        print(f"🔍 이관 대상 행 수: {count}")
+
+    # --- chunk 단위 select/insert ---
+    if count == 0:
+        print("📭 전송할 데이터가 없습니다.")
+        return
+
+    transferred = 0
+    with engine_src.connect() as conn_src, engine_dst.begin() as conn_dst:
+        stmt = select(src_table)
+        if where_clause is not None:
+            stmt = stmt.where(where_clause)
+        result = conn_src.execution_options(stream_results=True).execute(stmt)
+
+        rows = []
+        for row in result:
+            rows.append(dict(row._mapping))
+            if len(rows) >= chunk_size:
+                try:
+                    conn_dst.execute(insert(dst_table), rows)
+                    transferred += len(rows)
+                    print(f"✅ {transferred}/{count} rows migrated")
+                except SQLAlchemyError as e:
+                    print("❌ 데이터 삽입 중 오류 발생:", e)
+                    raise
+                rows = []
+        if rows:  # 남은 row
+            try:
+                conn_dst.execute(insert(dst_table), rows)
+                transferred += len(rows)
+                print(f"✅ {transferred}/{count} rows migrated")
+            except SQLAlchemyError as e:
+                print("❌ 데이터 삽입 중 오류 발생:", e)
+
+    print("🎉 이관 완료!")
