@@ -147,3 +147,56 @@ def transfer_data(conn_str_src, schema_src, table_src,
                 print("❌ 데이터 삽입 중 오류 발생:", e)
 
     print("🎉 이관 완료!")
+
+
+    from sqlalchemy import create_engine, MetaData, Table, insert, select
+from sqlalchemy.schema import CreateTable
+from sqlalchemy.exc import SQLAlchemyError
+
+def clone_table_and_transfer_data(src_conn_str, dst_conn_str, schema, table_name, chunk_size=10000):    
+    # 1. 엔진 및 메타데이터
+    engine_src = create_engine(src_conn_str)
+    engine_dst = create_engine(dst_conn_str)
+
+    metadata_src = MetaData(schema=schema)
+    metadata_src.reflect(bind=engine_src, only=[table_name])
+    src_table = Table(table_name, metadata_src, autoload_with=engine_src)
+
+    # 2. dst에 동일 테이블 생성
+    metadata_dst = MetaData(schema=schema)
+    dst_table = Table(table_name, metadata_dst)
+
+    # dst DB에 테이블 없으면 새로 생성
+    if not engine_dst.dialect.has_table(engine_dst.connect(), table_name, schema=schema):
+        ddl = str(CreateTable(src_table).compile(engine_dst))
+        print("🔨 Creating table in dst:\n", ddl)
+        with engine_dst.begin() as conn:
+            conn.execute(CreateTable(src_table))
+        print(f"✅ {table_name} 테이블 생성 완료")
+
+    # dst_table 객체 재반영
+    metadata_dst.reflect(bind=engine_dst, only=[table_name])
+    dst_table = Table(table_name, metadata_dst, autoload_with=engine_dst)
+
+    # 3. 데이터 이관
+    with engine_src.connect() as conn_src:
+        count = conn_src.execute(select(src_table.count())).scalar()
+        print(f"🚚 전체 이관 대상 행: {count}")
+
+        stmt = select(src_table)
+        result = conn_src.execution_options(stream_results=True).execute(stmt)
+
+        rows, transferred = [], 0
+        with engine_dst.begin() as conn_dst:
+            for row in result:
+                rows.append(dict(row._mapping))
+                if len(rows) >= chunk_size:
+                    conn_dst.execute(insert(dst_table), rows)
+                    transferred += len(rows)
+                    print(f"🔄 {transferred}/{count} rows migrated")
+                    rows = []
+            if rows:
+                conn_dst.execute(insert(dst_table), rows)
+                transferred += len(rows)
+                print(f"🔄 {transferred}/{count} rows migrated")
+        print(f"🎉 이관 완료! 총 {transferred} rows.")
