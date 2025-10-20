@@ -459,3 +459,45 @@ print(e3_values)  # 여러 개면 리스트로 출력
 ```
 
 필요 시 KeyError를 피하기 위해 isinstance와 in 체크를 유지하면 안전하게 접근할 수 있습니다.
+
+
+
+def to_table_html(data):
+    """
+    주어진 리스트 형태의 데이터를 HTML 테이블 코드로 변환하는 함수.
+    
+    Args:
+    - data (list of dict): 테이블 행 데이터를 포함하는 딕셔너리들의 리스트.
+    
+    Returns:
+    - str: HTML 형식의 테이블 코드를 반환.
+    """
+    
+    if not data:
+        return "<table></table>"
+
+    # 리스트의 첫 번째 딕셔너리에서 키를 얻어 테이블 헤더 생성
+    headers = data[0].keys()
+    header_html = "<tr>" + "".join(f"<th>{key}</th>" for key in headers) + "</tr>"
+
+    # 각 딕셔너리에서 값을 추출하여 테이블의 데이터 행 생성
+    rows_html = ""
+    for row in data:
+        row_html = "<tr>" + "".join(f"<td>{row[col]}</td>" for col in headers) + "</tr>"
+        rows_html += row_html
+
+    # 최종 HTML 테이블 코드 조립
+    table_html = f"<table border='1'>{header_html}{rows_html}</table>"
+    
+    return table_html
+
+# 예시 데이터
+data = [
+    {"id": "myuser1", "name": "choi"},
+    {"id": "myuser2", "name": "ch"},
+    # ... 추가 데이터
+]
+
+# 함수 실행 및 결과 출력
+html_snippet = to_table_html(data)
+print(html_snippet)
