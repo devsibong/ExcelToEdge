@@ -421,3 +421,41 @@ def advisor(request_dict: Dict[str, Any]) -> Tuple[bool, Optional[Dict[str, Any]
 - Input.Type이 chat이면 Input.value를 user_question에 매핑합니다.
 - invoke 결과와 초기 상태를 함께 JSON 파일로 저장합니다. 상위에서는 해당 파일을 읽어 해석하시면 됩니다.
 - TypedDict 필수 필드는 프로젝트 정의에 맞게 initial_state 부분을 보완하세요.
+
+
+아래는 result(dict[str, Any])에서 “두 번째 레벨에 있는 'test'”를 찾아 그 하위의 'E3' 값을 변수에 담아 출력하는 예시입니다.
+
+예시 1) 첫 번째로 발견된 'test'의 'E3'만 가져오기
+```python
+# result = planner_graph.invoke(...)
+# result는 dict[str, Any]
+
+test_dict = None
+e3_value = None
+
+for _, second_level in result.items():
+    if isinstance(second_level, dict) and 'test' in second_level:
+        test_dict = second_level['test']
+        if isinstance(test_dict, dict) and 'E3' in test_dict:
+            e3_value = test_dict['E3']
+        break  # 첫 매치만 사용하려면 break
+
+print(e3_value)
+```
+
+예시 2) 모든 두 번째 레벨의 'test'에서 'E3'를 모아서 리스트로 가져오기
+```python
+# result = planner_graph.invoke(...)
+
+e3_values = [
+    lvl2['test']['E3']
+    for lvl2 in result.values()
+    if isinstance(lvl2, dict)
+    and isinstance(lvl2.get('test'), dict)
+    and 'E3' in lvl2['test']
+]
+
+print(e3_values)  # 여러 개면 리스트로 출력
+```
+
+필요 시 KeyError를 피하기 위해 isinstance와 in 체크를 유지하면 안전하게 접근할 수 있습니다.
